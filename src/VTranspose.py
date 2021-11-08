@@ -12,9 +12,9 @@ def VTranspose(A):
     return VT
 
 
-A = np.array([  [3, 1, 1],
-                [-1, 3, 1]   ]) #Contoh matriks A
+# A = np.array([  [3, 1, 1],
+#                 [-1, 3, 1]   ]) #Contoh matriks A
 
-VT = VTranspose(A)
+# VT = VTranspose(A)
 
-print(VT)
+# print(VT)
