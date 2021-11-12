@@ -15,6 +15,4 @@ def openImage(imagePath):
 
 aRed, aGreen, aBlue = openImage('test/lena.png')
 
-U_aRed = U(aRed)
-
-print(U_aRed)
+print(U(aRed))

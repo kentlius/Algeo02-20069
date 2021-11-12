@@ -1,18 +1,21 @@
 import numpy as np
+from numpy import linalg
 
 def U(A):
-    AAT = A @ np.transpose(A) #Perkalian matriks A transpose dengan matriks A
-    nilai, vektor = np.linalg.eig(AAT) #Mendapat nilai eigen dan vektor eigen
+    Uz, S, VT = linalg.svd(A) #ambil S dan VT dari A
 
-    for i in range(2):
-        vektor[:,i] /= np.linalg.norm(vektor[:,i]) #Normalisasi vektor eigen
+    Sigmainv = np.zeros(A.shape) #matrix nol dengan bentuk A
+    np.fill_diagonal(Sigmainv, np.reciprocal(S)) #isi matriks dengan sigma reciprocal
 
-    return vektor
+    VTinv = linalg.inv(VT) #inverse VT
+
+    Uinv = A @ VTinv @ Sigmainv.T
+    # U = linalg.inv(Uinv)
+
+    return Uinv
 
 
-# A = np.array([  [3, 1, 1],
-#                 [-1, 3, 1]   ]) #Contoh matriks A
+# A = np.array([  [1, 2, -1],
+#                 [2, 1, -1],   ]) #Contoh matriks A
 
-# U = U(A)
-
-# print(U)
+# print(U(A))
