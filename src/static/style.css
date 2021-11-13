@@ -1,0 +1,15 @@
+/* .container{
+    border: solid;
+} */
+
+.header{
+    border-bottom: 1px solid black;
+}
+
+.btn{
+    margin: 1%;
+}
+
+input[type='number']{
+    width: 50px;
+}
