@@ -1,62 +1,28 @@
-import numpy as np
+import numpy
 from PIL import Image
-from U import *
 from Eigen import *
-from VTranspose import *
-
+from U import *
+from VT import *
 
 def openImage(imagePath):
     imOrig = Image.open(imagePath)
-    im = np.array(imOrig)
+    im = numpy.array(imOrig)
 
-    R = im[:, :, 0]
-    G = im[:, :, 1]
-    B = im[:, :, 2]
+    aRed = im[:, :, 0]
+    aGreen = im[:, :, 1]
+    aBlue = im[:, :, 2]
 
-    return [R, G, B]
+    return [aRed, aGreen, aBlue, imOrig]
 
+def compressSingleChannel(channelDataMatrix, singularValuesLimit):
+    y, x, vhChannel = numpy.linalg.svd(channelDataMatrix)
+    uChannel = U(channelDataMatrix)
+    sChannel = Sigma(channelDataMatrix)
 
-def compressSingleChannel(color, k):
-    # ganti untuk sesuaiin
-    # UChannel, SigmaChannel, VHChannel = np.linalg.svd(color)
-    UChannel, X, VHChannel = np.linalg.svd(color)
-    # UChannel = U(color)
-    SigmaChannel = EigenValue(color @ color.T)
-    # VHChannel = VTranspose(color)
-    #np.diag(SigmaChannel)[0:k, 0:k]
-    # SigmaChannel[0:k]
-    Compressed = np.zeros((color.shape[0], color.shape[1]))
-    # ImgCompressed = (
-    #     UChannel[:, 0:k] @ SigmaChannel[0:k] @ VHChannel[0:k, :])
+    aChannelCompressed = numpy.zeros((channelDataMatrix.shape[0], channelDataMatrix.shape[1]))
+    k = singularValuesLimit
 
-    ImgCompressed = (
-        UChannel[:, 0:k] @ np.diag(SigmaChannel)[0:k, 0:k] @ VHChannel[0:k, :])
-    Compressed = ImgCompressed.astype('uint8')
-    return Compressed
-
-
-# ubah foto dari website
-R, G, B = openImage('test/lena.png')
-# # im = Image.open('test/lena.png')
-# # width, height = im.size
-# # print(width, height)
-
-# # menerima berapa persen kompressi
-SVL = round(10.5)
-
-RC = compressSingleChannel(R, SVL)
-GC = compressSingleChannel(G, SVL)
-BC = compressSingleChannel(B, SVL)
-
-newR = Image.fromarray(RC, mode=None)
-newG = Image.fromarray(GC, mode=None)
-newB = Image.fromarray(BC, mode=None)
-
-newImage = Image.merge("RGB", (newR, newG, newB))
-
-# OImage.show()
-newImage.show()
-
-# X, S, Y = np.linalg.svd(R)
-# print(EigenValue(R @ R.T))
-# print(S)
+    leftSide = numpy.matmul(uChannel[:, 0:k], numpy.diag(sChannel)[0:k, 0:k])
+    aChannelCompressedInner = numpy.matmul(leftSide, vhChannel[0:k, :])
+    aChannelCompressed = aChannelCompressedInner.astype('uint8')
+    return aChannelCompressed
