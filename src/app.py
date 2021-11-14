@@ -1,5 +1,5 @@
-import os
-from flask import Flask, flash, request, redirect, url_for, render_template, send_from_directory
+import os, time
+from flask import Flask, flash, request, redirect, url_for, render_template, send_from_directory, g
 from werkzeug.utils import secure_filename
 from main import *
  
@@ -59,7 +59,11 @@ def display_image(filename):
 def display_image_c(rate):
     aRed, aGreen, aBlue, originalImage = openImage('static/uploads/image.png')
 
-    singularValuesLimit = int(rate)
+    width, height = originalImage.size
+
+    originalSize = height * width * 3
+    compressedSize = (float(rate)/100)*originalSize
+    singularValuesLimit = int(compressedSize/((1 + height + width) * 3))
 
     aRedCompressed = compressSingleChannel(aRed, singularValuesLimit)
     aGreenCompressed = compressSingleChannel(aGreen, singularValuesLimit)
@@ -74,6 +78,20 @@ def display_image_c(rate):
     newImage.save(os.path.join(app.config['UPLOAD_FOLDER'], 'compress.png'))
 
     return redirect(url_for('static', filename='uploads/' + 'compress.png'), code=301)
+
+@app.before_request
+def before_request():
+    g.start = time.time()
+
+@app.after_request
+def after_request(response):
+    diff = time.time() - g.start
+    if ((response.response) and
+        (200 <= response.status_code < 300) and
+        (response.content_type.startswith('text/html'))):
+        response.set_data(response.get_data().replace(
+            b'__EXECUTION_TIME__', bytes(str(diff), 'utf-8')))
+    return response
 
 if __name__ == "__main__":
     app.run(debug=True)
