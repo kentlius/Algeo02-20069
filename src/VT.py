@@ -1,12 +1,9 @@
-import numpy as np
+from Eigen import *
 
-def VT(A):
-    ATA = np.transpose(A) @ A #Perkalian matriks A transpose dengan matriks A
-    nilai, vektor = np.linalg.eig(ATA) #Mendapat nilai eigen dan vektor eigen
+def VTranspose(A):
+    ATA = A.T @ A #Perkalian matriks A transpose dengan matriks A
+    nilai, vektor = find_eig_qr(ATA) #Mendapat nilai eigen dan vektor eigen
 
-    for i in range(3):
-        vektor[:,i] /= np.linalg.norm(vektor[:,i]) #Normalisasi vektor eigen
-
-    VT = np.transpose(vektor) #Transpose V(hasil normalisasi)
+    VT = vektor.T #Transpose V
 
     return VT

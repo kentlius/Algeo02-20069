@@ -1,20 +1,21 @@
 import numpy as np
 
 
-def EigenVector(M):
-    X, Y = np.linalg.eig(M)
-    return Y
+def find_eig_qr(A):
+    Sigma = []
+    pQ = np.eye(A.shape[0])
+    X = A.copy()
+    for i in range(100):
+        Q, R = np.linalg.qr(X)
+        pQ = pQ @ Q
+        X = R @ Q
+    return np.diag(X), pQ
+    # np.diag(X) adalah eigen value, pQ adalah eigen vector
 
 
-def EigenValue(M):
-    Out = []
-    for i in range(10):
-        Q, R = np.linalg.qr(M)
-        M = R @ Q
+def Sigma(A):
+    S = []
+    M, _ = find_eig_qr(A @ A.T)
     for i in range(len(M)):
-        if (M[i][i] < 0):
-            Out.append((M[i][i]*(-1))**(1/2))
-        else:
-            Out.append((M[i][i])**(1/2))
-    Out.sort(reverse=True)
-    return(Out)
+        S.append(np.abs(M[i]))
+    return S
